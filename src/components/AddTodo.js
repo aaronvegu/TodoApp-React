@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 export class AddTodo extends Component {
   state = {
@@ -18,8 +19,8 @@ export class AddTodo extends Component {
     // Mandamos nuestro state title mediante nuestro prop addTodo
     this.props.addTodo(this.state.title);
     // Y limpiamos nuestro estado para borrar la info seteado previamente mediente onChange()
-    this.setState({title: ''});
-  }
+    this.setState({ title: '' });
+  };
 
   render() {
     return (
@@ -42,5 +43,10 @@ export class AddTodo extends Component {
     );
   }
 }
+
+// PropTypes
+AddTodo.propTypes = {
+  addTodo: PropTypes.func.isRequired,
+};
 
 export default AddTodo;

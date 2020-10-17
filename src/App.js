@@ -4,7 +4,7 @@ import Todos from './components/Todos';
 import Header from './components/layout/Header';
 import AddTodo from './components/AddTodo';
 import About from './components/pages/About';
-import { v4 as uuid } from 'uuid';
+// import { v4 as uuid } from 'uuid';
 import Axios from 'axios';
 
 import './App.css';
@@ -15,6 +15,9 @@ class App extends Component {
     todos: [],
   };
 
+  // Clase del Lifecycle. La primera vez que se recargue la pagina haremos una solicitud get a
+  // JSONPlaceholder para usarlo como un servicio de backend y traer 13 todo items mediante una
+  // promesa, y la seteamos en nuestro objeto de estados
   componentDidMount() {
     Axios.get(
       'https://jsonplaceholder.typicode.com/todos?_limit=13'
@@ -50,10 +53,17 @@ class App extends Component {
 
   //Delete Todo function
   // Traemos el id del TodoItem presionado desde el componente TodoItem
+  // Hacemos uso de la libreria axios para realizar un HTTP Request de tipo delete,
+  // para mandar una solicitud al backend y eliminar el todo con el id mandado en la URI
+  // Esto se realiza mediante una promesa, por lo tanto, de llevarse a cabo exitosamente,
+  // seteamos el state obteniendo todos los states y aplicando una funcion filter donde
+  // nos traiga todos los id de los todo cuando sean distintos al id pasado como parametro
   delTodo = (id) => {
-    this.setState({
-      todos: [...this.state.todos.filter((todo) => todo.id !== id)],
-    });
+    Axios.delete(`https://jsonplaceholder.typicode.com/todos/${id}`).then((r) =>
+      this.setState({
+        todos: [...this.state.todos.filter((todo) => todo.id !== id)],
+      })
+    );
   };
   /**
    * delTodo:
@@ -70,18 +80,17 @@ class App extends Component {
    * Hacemos un setState donde le setearemos todos los estados ya existentes con nuestro spread op
    * y le agregaremos un nuevo estado que crearemos anteriormente en la variable newTodo y la agregamos
    * al arreglo de estados. El title lo tomamos desde el propio prop que lo recibe como parametro.
-   * Usaremos la libreria uuid para generar los ids aleatorios de manera automatica, importando la libreria
-   * como v4 y nombrandola uuid
+   *
+   * Haciendo uso de HTTP Request a nuestro back con axios, realizamos una solicitud post para editar el back
+   * y agregar un nuevo todo con el titulo obtenido como parametro y el valor completed en false. El id lo asigna
+   * por defecto nuestro back, y una vez que hemos agregago el todo al back, nos traemos la respuesta del back
+   * y usamos su propiedad data para setear los estados de nuevo en nuestro front y mostrarlo al usuario
    */
   addTodo = (title) => {
-    const newTodo = {
-      id: uuid(),
+    Axios.post('https://jsonplaceholder.typicode.com/todos', {
       title: title,
       completed: false,
-    };
-    this.setState({
-      todos: [...this.state.todos, newTodo],
-    });
+    }).then((r) => this.setState({ todos: [...this.state.todos, r.data] }));
   };
 
   // Le pasamos a nuestro componente Todos los estados mediante props
